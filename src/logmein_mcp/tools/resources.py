@@ -21,7 +21,13 @@ def register(mcp: FastMCP, client_factory: Callable[[], LogMeInClient | None]) -
                     "Report type: 0 Session, 1 Customer Survey, 2 Login, "
                     "3 Missed Sessions, 4 Performance, 5 Chat Log, 6 Custom "
                     "Fields, 7 Transferred Sessions, 8 Technician Survey, "
-                    "9 Collaboration Chatlog, 10 Failed Sessions."
+                    "9 Collaboration Chatlog, 10 Failed Sessions. The "
+                    "vendor's own docs don't define what distinguishes "
+                    "same-topic pairs beyond this label (Missed Sessions "
+                    "vs Failed Sessions; Customer Survey vs Technician "
+                    "Survey; Chat Log vs Collaboration Chatlog) — if a "
+                    "request's wording doesn't clearly favor one, ask the "
+                    "user rather than guess."
                 )
             ),
         ],
@@ -76,14 +82,27 @@ def register(mcp: FastMCP, client_factory: Callable[[], LogMeInClient | None]) -
     @mcp.tool(annotations=ToolAnnotations(readOnlyHint=True))
     async def logmein_get_session(
         node: Annotated[
-            str, Field(description="The technician or channel node ID to list sessions for.")
+            str,
+            Field(
+                description=(
+                    "The technician or channel node ID to list sessions "
+                    "for — a numeric ID (e.g. \"4521\"), not a person's or "
+                    "channel's display name. This server has no directory/"
+                    "lookup tool — if you only have a name, ask the user "
+                    "for the numeric ID rather than guessing one."
+                )
+            ),
         ],
         noderef: Annotated[
             Literal["NODE", "CHANNEL"],
             Field(description="Whether node is a technician (NODE, default) or a CHANNEL."),
         ] = "NODE",
     ) -> str:
-        """List the current/recent sessions of a hierarchy node (technician or channel)."""
+        """List the current/recent sessions of ONE hierarchy node (technician
+        or channel) — there is no account-wide/multi-node variant. For
+        account-wide aggregate session data over a date range instead (not a
+        live snapshot), use logmein_get_report with report_area=0.
+        """
         client = client_factory()
         if client is None:
             return NO_TOKEN
@@ -96,7 +115,16 @@ def register(mcp: FastMCP, client_factory: Callable[[], LogMeInClient | None]) -
     @mcp.tool(annotations=ToolAnnotations(readOnlyHint=True))
     async def logmein_get_chat(
         session: Annotated[
-            str, Field(description="The session ID (get it from logmein_get_session).")
+            str,
+            Field(
+                description=(
+                    "The session ID — NOT a technician or channel node ID "
+                    "(that's a different ID space, used by "
+                    "logmein_get_session's node param). If you only have a "
+                    "technician/channel identifier, call "
+                    "logmein_get_session first to obtain a real session ID."
+                )
+            ),
         ],
     ) -> str:
         """Retrieve the chat log of a specific Rescue session."""
@@ -112,7 +140,16 @@ def register(mcp: FastMCP, client_factory: Callable[[], LogMeInClient | None]) -
     @mcp.tool(annotations=ToolAnnotations(readOnlyHint=True))
     async def logmein_get_note(
         session: Annotated[
-            str, Field(description="The session ID (get it from logmein_get_session).")
+            str,
+            Field(
+                description=(
+                    "The session ID — NOT a technician or channel node ID "
+                    "(that's a different ID space, used by "
+                    "logmein_get_session's node param). If you only have a "
+                    "technician/channel identifier, call "
+                    "logmein_get_session first to obtain a real session ID."
+                )
+            ),
         ],
     ) -> str:
         """Retrieve the technician's note(s) for a specific Rescue session."""
