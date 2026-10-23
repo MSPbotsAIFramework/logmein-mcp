@@ -103,12 +103,12 @@ single tool invocation**, then makes the real API call(s) on that same
 short-lived `httpx.AsyncClient` (and therefore the same cookie) before
 discarding it entirely.
 
-### HEADER 授权参数说明
+### HEADER Authorization Parameters
 
-| Header | 类型 | 是否必填 | 默认值 | 枚举值 | 字段描述 | Example |
+| Header | Type | Required | Default | Allowed values | Description | Example |
 |---|---|---|---|---|---|---|
-| `X-LogMeIn-Username` | string | 是 | 无 | 无 | LogMeIn Rescue 账号邮箱/用户名 | `admin@example.com` |
-| `X-LogMeIn-Password` | string | 是 | 无 | 无 | 对应密码 | `••••••••` |
+| `X-LogMeIn-Username` | string | Yes | None | None | LogMeIn Rescue account email/username | `admin@example.com` |
+| `X-LogMeIn-Password` | string | Yes | None | None | Corresponding password | `••••••••` |
 
 Missing either header returns `401`:
 ```json
@@ -128,11 +128,11 @@ full error-code vocabulary.
 
 ## Environment Variables
 
-| Variable | 类型 | 是否必填 | 默认值 | 说明 |
+| Variable | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `MCP_HTTP_PORT` | int | 否 | `8080` | HTTP 监听端口 |
-| `MCP_HTTP_HOST` | string | 否 | `0.0.0.0` | HTTP 监听地址 |
-| `LOGMEIN_BASE_URL` | string | 否 | `https://secure.logmeinrescue.com/API` | Rescue API 基础 URL |
+| `MCP_HTTP_PORT` | int | No | `8080` | HTTP listen port |
+| `MCP_HTTP_HOST` | string | No | `0.0.0.0` | HTTP listen address |
+| `LOGMEIN_BASE_URL` | string | No | `https://secure.logmeinrescue.com/API` | Rescue API base URL |
 
 ## MCP Endpoint
 
@@ -143,12 +143,12 @@ full error-code vocabulary.
 
 All 4 tools are read-only (`readOnlyHint=True`); there are no write/delete tools in this service.
 
-| Tool | 功能 | 参数 |
+| Tool | Description | Parameters |
 |---|---|---|
-| `logmein_get_report` | 生成并获取 Rescue 报表（依次调用 setReportArea + 可选 setReportDate_v2 + getReport_v2） | `report_area`（必填，0-10 枚举），`node`（可选，默认 `-2`），`nodetype`（可选，默认 `EXTERNALROOT`），`begin_date`/`end_date`（可选） |
-| `logmein_get_session` | 列出某个节点（技术员/频道）当前/近期的会话 | `node`（必填），`noderef`（可选，`NODE`/`CHANNEL`，默认 `NODE`） |
-| `logmein_get_chat` | 获取指定会话的聊天记录 | `session`（必填，会话 ID） |
-| `logmein_get_note` | 获取指定会话的技术员备注 | `session`（必填，会话 ID） |
+| `logmein_get_report` | Generate and fetch a Rescue report (calls setReportArea, then optionally setReportDate_v2, then getReport_v2) | `report_area` (required, enum 0-10), `node` (optional, default `-2`), `nodetype` (optional, default `EXTERNALROOT`), `begin_date`/`end_date` (optional) |
+| `logmein_get_session` | List current/recent sessions of a node (technician/channel) | `node` (required), `noderef` (optional, `NODE`/`CHANNEL`, default `NODE`) |
+| `logmein_get_chat` | Get the chat transcript of a given session | `session` (required, session ID) |
+| `logmein_get_note` | Get the technician notes of a given session | `session` (required, session ID) |
 
 On success, responses are the vendor's raw pipe-delimited text (starting
 with `OK` or `ERROR`, never JSON), returned as-is — consistent with how
@@ -180,7 +180,7 @@ an error envelope — it is returned as-is in the raw text result, exactly
 as the vendor's API replies, since that's a normal (if empty/negative)
 query outcome rather than a transport failure.
 
-## 测试示例
+## Test Example
 
 ```bash
 # Health check
